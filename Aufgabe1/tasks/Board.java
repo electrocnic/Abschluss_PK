@@ -29,8 +29,8 @@ public class Board extends JPanel {
     @Override
     public void paintComponent( Graphics g ) { //TODO: better method???
         super.paintComponent(g);
-        g.setColor(Color.WHITE);  //clear the whole thing
-        g.fillOval(0,0,Mondrian.MAX_FIELD_SIZE_X, Mondrian.MAX_FIELD_SIZE_Y);
+        //g.setColor(Color.WHITE);  //clear the whole thing
+        //g.fillOval(0,0,Mondrian.MAX_FIELD_SIZE_X, Mondrian.MAX_FIELD_SIZE_Y);
         //g.fillOval(50,50,50,50);
         for( Enemy enemy : controller.getEnemies() ) {         //draw enemies new
             /*

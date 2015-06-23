@@ -60,7 +60,7 @@ public class Enemy extends Thread {
 
             System.out.println("Enemy.run:  Calling repaint");
             //this.setRepaint(true);
-            board.repaint();
+           board.repaint();
 
             //TODO: make movement that it trys to go to the player.
             //TODO: move: change direction doesnt work quite well :D

@@ -19,6 +19,7 @@ public class Mondrian extends JFrame implements ActionListener, KeyListener {
     private Player player;
     private boolean lose;
 
+    private boolean running=true;
     /** Changed: Andreas Wiesinger [1429087]
      * Constructor of Controller, which creates 1 Enemy with Red Color and Size 12, player size 8.
      * Player starts at 0,0;
@@ -123,9 +124,20 @@ public class Mondrian extends JFrame implements ActionListener, KeyListener {
     }
 
     public static void main(String[] args) {
+
+
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 Mondrian window = new Mondrian();
+                //Run the infinite painting lopp
+                /*while (true){
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    window.board.repaint();
+                }*/
             }
         });
     }
