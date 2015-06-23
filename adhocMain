@@ -1,0 +1,103 @@
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+@SuppressWarnings("serial")
+public class Aufgabe5 extends JPanel {
+
+    public static int SIZE_X=300;
+    public static int SIZE_Y=400;
+
+    private List<Ball> balls;
+
+
+
+    public Aufgabe5(Color[] colors, float[] speeds, int[] sizes) throws Exception{
+        balls = new ArrayList<Ball>();
+        if( colors==null || speeds==null || sizes==null ) throw new Exception("Oje");
+        if( colors.length!=speeds.length ||colors.length!=sizes.length ) throw new Exception("Oje");
+        for(int i=0; i<colors.length; i++) {
+            balls.add( new Ball(this,sizes[i],colors[i],speeds[i]) );
+        }
+    }
+
+    /**
+     * Checks if ball1 collided with ball2.
+     * @param ball1
+     * @param ball2
+     * @return
+     */
+    public static boolean isCollided(Ball ball1, Ball ball2) {
+        int size1 = ball1.getSize();
+        int size2 = ball2.getSize();
+        double xDif = ball1.getX() - ball2.getX();
+        double yDif = ball1.getY() - ball2.getY();
+        double distanceSquared = xDif * xDif + yDif * yDif;
+        return distanceSquared < (size1 + size2) * (size1 + size2);
+    }
+
+    /**
+     * Checks if ball is collided with any of the other balls.
+     * @param ball
+     * @param balls
+     * @return
+     */
+    public static boolean isCollided( Ball ball, List<Ball> balls ) {
+        for( Ball ball2 : balls ) {
+            if( !ball.equals(ball2) ) {
+                if( isCollided(ball, ball2) ) return true;
+            }
+        }
+        return false;
+    }
+
+    public List<Ball> getBalls() {
+        return balls;
+    }
+
+    public void moveBalls() {
+        for( Ball ball : balls ) {
+            ball.moveBall();
+        }
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+
+
+        for( Ball ball : balls ) {
+            g2d.setColor(ball.getColor());
+            g2d.fillOval(ball.getX(), ball.getY(), ball.getSize(), ball.getSize());
+        }
+
+
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        JFrame frame = new JFrame("Sample Frame");
+        Color[] colors=new Color[]{Color.black, Color.blue, Color.GREEN, Color.orange};
+        int[] sizes = new int[]{5, 10, 15, 13};
+        float[] speeds = new float[]{3.5f, 1.0f, 1.5f, 2.7f};
+        Aufgabe5 game=null;
+        try {
+            game = new Aufgabe5(colors, speeds, sizes);
+        frame.add(game);
+        frame.setSize(SIZE_X, SIZE_Y);
+        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
+        while (true) {
+            game.moveBalls();
+            game.repaint();
+            Thread.sleep(10);
+        }
+        }catch (Exception e) {e.printStackTrace();}
+    }
+}
