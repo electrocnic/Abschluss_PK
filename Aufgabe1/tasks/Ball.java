@@ -2,6 +2,7 @@ import java.awt.*;
 
 /**
  * Created by Andreas Wiesinger [1429087] on 22.06.2015.
+ * Collaborator: Filip Gerat
  */
 public class Ball {
 
