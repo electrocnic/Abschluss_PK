@@ -1,4 +1,10 @@
+import javax.net.ssl.HttpsURLConnection;
+import javax.swing.*;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 public class Slang {
 
@@ -72,12 +78,24 @@ public class Slang {
                     case "add": f_add(); break;
                     case "div": f_div(); break;
                     case "mod": f_mod(); break;
-                    default: //throw error
+                    case "read": f_read(); break;
+                    case "write": f_write(); break;
+                    case "ask": f_ask(); break;
+                    case "askn": f_askn(); break;
+                    case "append": f_append(); break;
+                    case "skip-to": f_skipto(); break;
+                    case "skip-n": f_skipn(); break;
+                    case "trunc": f_trunc(); break;
+                    case "copy-to": f_copyto(); break;
+                    case "dup": f_dup(); break;
+                    case "pop": f_pop(); break;
+                    default: //TODO: throw error
                 }
                 /*/fg*/
             }
             else {
                 System.out.println("UNKNOWN: " + sc.next());
+                //TODO: throw error
             }
         }
     }
@@ -115,6 +133,101 @@ public class Slang {
         myStack.push(new IntValue(myStack.pop().toI() % myStack.pop().toI()));
     }
     private static void f_read(){
+        String s = myStack.pop().toS();
+        Pattern p = Pattern.compile("\\Ahttps?://");
+        if (p.matcher(s).find()){
+            try {
+                if (s.charAt(4) == 's'){
+                    s = sendGet(s, true);
+                } else {
+                    s = sendGet(s, false);
+                }
+                myStack.push(new StringValue(s));
+            } catch (Exception e){
+                //TODO: resolve exceptions
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                String currLine;
+                StringBuffer sb = new StringBuffer();
+                BufferedReader br = new BufferedReader(new FileReader(s));
+                while ((currLine = br.readLine()) != null){
+                    sb.append(currLine);
+                }
+                myStack.push(new StringValue(sb.toString()));
+            } catch (Exception e){
+                //TODO: resolve exceptions
+            }
+        }
+    }
+    private static void f_write(){
+        try {
+            String s = myStack.pop().toS();
+            File f = new File(myStack.pop().toS());
+            if (!f.exists()){
+                f.createNewFile();
+            }
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f.getAbsoluteFile()));
+            bw.write(s);
+            bw.close();
+        } catch (Exception e) {
+            System.out.println("ERROR IN WRITE");
+            //TODO: resolve exceptions
+        }
+    }
+    private static void f_ask(){
+        String inputValue = JOptionPane.showInputDialog(myStack.pop().toS());
+        myStack.push(new StringValue(inputValue));
+    }
+    private static void f_askn(){
+        int inputValue = Integer.parseInt(JOptionPane.showInputDialog(myStack.pop().toS()));
+        myStack.push(new IntValue(inputValue));
+    }
+    private static void f_append(){
+        String s = myStack.pop().toS();
+        myStack.push(new StringValue(myStack.pop().toS() + s));
+    }
+    private static void f_skipto(){
+        //TODO: write method
+    }
+    private static void f_skipn(){
+        //TODO: write method
+    }
+    private static void f_trunc(){
+        //TODO: write method
+    }
+    private static void f_copyto(){
+        //TODO: write method
+    }
+    private static void f_dup(){
+        //TODO: write method
+    }
+    private static void f_pop(){
+        //TODO: write method
+    }
+
+    //Helper for GET request
+    private static String sendGet(String url, boolean isSecure) throws Exception{
+        URL obj = new URL(url);
+        HttpURLConnection con;
+        if (isSecure) {
+            con = (HttpsURLConnection) obj.openConnection();
+        } else {
+            con = (HttpURLConnection) obj.openConnection();
+        }
+        con.setRequestMethod("GET");
+        //idk if necessary
+        con.setRequestProperty("User-agent", "Mozilla/5.0");
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response =  new StringBuffer();
+        while((inputLine = br.readLine())!= null){
+            response.append(inputLine);
+        }
+        br.close();
+        return response.toString();
     }
     /*/fg*/
 
