@@ -40,7 +40,6 @@ public class Slang {
     /*/fg*/
 
     public static void main(String[] args) {
-
         /*fg: Stack initialization */
         myStack = new Stack<Value>();
         /*/fg*/
@@ -76,6 +75,7 @@ public class Slang {
                     case "print": f_print(); break;
                     case "sub": f_sub(); break;
                     case "add": f_add(); break;
+                    case "mul": f_mul(); break;
                     case "div": f_div(); break;
                     case "mod": f_mod(); break;
                     case "read": f_read(); break;
@@ -103,12 +103,12 @@ public class Slang {
     /*fg: Atom functions */
     private static void printStack(){
         Stack<Value> tmpStack = new Stack<Value>();
-        System.out.println("-- Top of Stack: ");
+        System.out.print("--Stack:\n");
         while(!myStack.empty()){
             tmpStack.push(myStack.peek());
-            System.out.println(myStack.pop().toS());
+            System.out.print(myStack.pop().toS() + "\n");
         }
-        System.out.println("-- Bottom");
+        System.out.println("--bottom");
         while(!tmpStack.empty()){
             myStack.push(tmpStack.pop());
         }
@@ -121,16 +121,22 @@ public class Slang {
         System.out.println(myStack.pop().toS());
     }
     private static void f_sub(){
-        myStack.push(new IntValue(myStack.pop().toI() - myStack.pop().toI()));
+        int t = myStack.pop().toI();
+        myStack.push(new IntValue(myStack.pop().toI() - t));
     }
     private static void f_add(){
         myStack.push(new IntValue(myStack.pop().toI() + myStack.pop().toI()));
     }
+    private static void f_mul(){
+        myStack.push(new IntValue(myStack.pop().toI() * myStack.pop().toI()));
+    }
     private static void f_div(){
-        myStack.push(new IntValue(myStack.pop().toI() / myStack.pop().toI()));
+        int t = myStack.pop().toI();
+        myStack.push(new IntValue(myStack.pop().toI() / t));
     }
     private static void f_mod(){
-        myStack.push(new IntValue(myStack.pop().toI() % myStack.pop().toI()));
+        int t = myStack.pop().toI();
+        myStack.push(new IntValue(myStack.pop().toI() % t));
     }
     private static void f_read(){
         String s = myStack.pop().toS();
