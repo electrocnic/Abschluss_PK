@@ -194,23 +194,43 @@ public class Slang {
         String s = myStack.pop().toS();
         myStack.push(new StringValue(myStack.pop().toS() + s));
     }
-    private static void f_skipto(){
-        //TODO: write method
+    private static void f_skipto(){ //andreas
+        String s = myStack.pop().toS();
+        try {
+            myStack.push(new StringValue(s.substring(s.indexOf(myStack.pop().toS()))));
+        }catch( IndexOutOfBoundsException e ) {
+            myStack.push(new StringValue(""));
+        }
     }
-    private static void f_skipn(){
-        //TODO: write method
+    private static void f_skipn(){ //andreas
+        String s = myStack.pop().toS();
+        try {
+            myStack.push(new StringValue(s.substring(myStack.pop().toI())));
+        }catch( IndexOutOfBoundsException e ) {
+            myStack.push(new StringValue(""));
+        }
     }
-    private static void f_trunc(){
-        //TODO: write method
+    private static void f_trunc(){ //andreas
+        String s = myStack.pop().toS();
+        try {
+            myStack.push(new StringValue(s.substring(0, myStack.pop().toI())));
+        }catch( IndexOutOfBoundsException e ) {
+            myStack.push(new StringValue(""));
+        }
     }
-    private static void f_copyto(){
-        //TODO: write method
+    private static void f_copyto(){ //andreas
+        String s = myStack.pop().toS();
+        try {
+            myStack.push(new StringValue(s.substring(0, s.indexOf(myStack.pop().toS()))));
+        }catch( IndexOutOfBoundsException e ) {
+            myStack.push(new StringValue(""));
+        }
     }
-    private static void f_dup(){
-        //TODO: write method
+    private static void f_dup(){ //andreas
+        myStack.push(myStack.peek());
     }
-    private static void f_pop(){
-        //TODO: write method
+    private static void f_pop(){ //andreas
+        myStack.pop();
     }
 
     //Helper for GET request
