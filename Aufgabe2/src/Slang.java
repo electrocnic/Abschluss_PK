@@ -50,59 +50,58 @@ public class Slang {
 
         try {
             sc = new AtomScanner(System.in);
-        } catch (LexerException ex) {
-            System.out.println(ex);
-            return;
-        }
 
-        while (sc.hasNext() && !err) {
-            if (sc.hasNextString()) {
-                /*fg:
-                 * default:{ System.out.println("STRING: " + sc.nextString());} */
-                myStack.push(new StringValue(sc.nextString()));
-                /*/fg*/
-             }
-            else if (sc.hasNextInteger()) {
-                /*fg:
-                 * default: System.out.println("INTEGER: " + sc.nextInteger());*/
-                myStack.push(new IntValue(sc.nextInteger()));
-                /*/fg*/
-            }
-            else if (sc.hasNextAtom()) {
-                /*fg:
-                 * default: System.out.println("ATOM: " + sc.nextAtom());*/
-                String s = sc.nextAtom(); //andreas
-                switch( s ) {
-                    case ".s": printStack(); break;
-                    case "prin": f_prin(); break;
-                    case "print": f_print(); break;
-                    case "sub": f_sub(); break;
-                    case "add": f_add(); break;
-                    case "mul": f_mul(); break;
-                    case "div": f_div(); break;
-                    case "mod": f_mod(); break;
-                    case "read": f_read(); break;
-                    case "write": f_write(); break;
-                    case "ask": f_ask(); break;
-                    case "askn": f_askn(); break;
-                    case "append": f_append(); break;
-                    case "skip-to": f_skipto(); break;
-                    case "skip-n": f_skipn(); break;
-                    case "trunc": f_trunc(); break;
-                    case "copy-to": f_copyto(); break;
-                    case "dup": f_dup(); break;
-                    case "pop": f_pop(); break;
-                    default:    System.out.println("[PARSER ERROR] unknown atom '" + s + "'"); //andreas
-                                err=true;
-                                //throw new LexerError("[PARSER ERROR] unknown atom '" + s + "'"); //andreas
+            while (sc.hasNext() && !err) {
+                if (sc.hasNextString()) {
+                    /*fg:
+                     * default:{ System.out.println("STRING: " + sc.nextString());} */
+                    myStack.push(new StringValue(sc.nextString()));
+                    /*/fg*/
+                 }
+                else if (sc.hasNextInteger()) {
+                    /*fg:
+                     * default: System.out.println("INTEGER: " + sc.nextInteger());*/
+                    myStack.push(new IntValue(sc.nextInteger()));
+                    /*/fg*/
                 }
-                /*/fg*/
+                else if (sc.hasNextAtom()) {
+                    /*fg:
+                     * default: System.out.println("ATOM: " + sc.nextAtom());*/
+                    String s = sc.nextAtom(); //andreas
+                    switch( s ) {
+                        case ".s": printStack(); break;
+                        case "prin": f_prin(); break;
+                        case "print": f_print(); break;
+                        case "sub": f_sub(); break;
+                        case "add": f_add(); break;
+                        case "mul": f_mul(); break;
+                        case "div": f_div(); break;
+                        case "mod": f_mod(); break;
+                        case "read": f_read(); break;
+                        case "write": f_write(); break;
+                        case "ask": f_ask(); break;
+                        case "askn": f_askn(); break;
+                        case "append": f_append(); break;
+                        case "skip-to": f_skipto(); break;
+                        case "skip-n": f_skipn(); break;
+                        case "trunc": f_trunc(); break;
+                        case "copy-to": f_copyto(); break;
+                        case "dup": f_dup(); break;
+                        case "pop": f_pop(); break;
+                        default: throw new ParserError("unknown atom '" + s + "'"); //andreas
+                    }
+                    /*/fg*/
+                }
+                else {
+                    throw new LexerError("UNKNOWN: " + sc.next()); //andreas
+                }
             }
-            else {
-                System.out.println("UNKNOWN: " + sc.next());
-                //TODO: throw error, change if this is wrong :D
-                throw new LexerError("UNKNOWN: " + sc.next()); //andreas
-            }
+        } catch (ParserError ex) {
+            System.out.println(ex);
+        } catch (LexerException ex) {
+            System.out.println("[LEXER ERROR] (" + ex.getPosition() + ") " + ex.getMessage());
+        } catch (EvalError ex) {
+            System.out.println(ex);
         }
     }
 
@@ -144,20 +143,19 @@ public class Slang {
         int t = myStack.pop().toI();
         myStack.push(new IntValue(myStack.pop().toI() % t));
     }
-    private static void f_read(){
+    private static void f_read() throws EvalError {
         String s = myStack.pop().toS();
         Pattern p = Pattern.compile("\\Ahttps?://");
         if (p.matcher(s).find()){
             try {
-                if (s.charAt(4) == 's'){
+                if (s.charAt(4) == 's') {
                     s = sendGet(s, true);
                 } else {
                     s = sendGet(s, false);
                 }
                 myStack.push(new StringValue(s));
-            } catch (Exception e){
-                //TODO: resolve exceptions, still dont know what to do here...
-                e.printStackTrace();
+            } catch (IOException e){
+                throw new EvalError(e.getMessage());
             }
         } else {
             try {
@@ -168,14 +166,14 @@ public class Slang {
                     sb.append(currLine);
                 }
                 myStack.push(new StringValue(sb.toString()));
-            } catch (Exception e){
-                //TODO: resolve exceptions, same here.
-                System.out.println("[EVAL ERROR] file not found: " + s);
-                //throw new LexerError("[EVAL ERROR] file not found: " + s);
+            } catch (FileNotFoundException e){
+                throw new EvalError("file not found: " + s);
+            } catch (IOException e){
+                throw new EvalError(e.getMessage());
             }
         }
     }
-    private static void f_write(){
+    private static void f_write() throws EvalError{
         try {
             String s = myStack.pop().toS();
             File f = new File(myStack.pop().toS());
@@ -185,9 +183,8 @@ public class Slang {
             BufferedWriter bw = new BufferedWriter(new FileWriter(f.getAbsoluteFile()));
             bw.write(s);
             bw.close();
-        } catch (Exception e) {
-            System.out.println("ERROR IN WRITE");
-            //TODO: resolve exceptions, I dont wanna.
+        } catch (IOException e) {
+            throw new EvalError(e.getMessage());
         }
     }
     private static void f_ask(){
@@ -247,7 +244,7 @@ public class Slang {
     }
 
     //Helper for GET request
-    private static String sendGet(String url, boolean isSecure) throws Exception{
+    private static String sendGet(String url, boolean isSecure) throws IOException{
         URL obj = new URL(url);
         HttpURLConnection con;
         if (isSecure) {

@@ -13,4 +13,5 @@ public class LexerError extends Error {
     public SourcePosition getPosition() {
         return position;
     }
+
 }

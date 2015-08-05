@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.rules.Timeout;
 
 import java.io.*;
-import java.util.Scanner;
 
 import static org.junit.Assert.*;
 
@@ -44,7 +43,7 @@ public class SlangTest {
     }
 
     @Rule
-    public Timeout globalTimeout = new Timeout(1000);
+    public Timeout globalTimeout = new Timeout(3000);
 
     public void testMain() throws Exception {
 
@@ -346,7 +345,7 @@ public class SlangTest {
             e.printStackTrace();
         }
     }
-    /*
+
     @Test
     public void test32(){
         try {
@@ -384,7 +383,7 @@ public class SlangTest {
         } catch (Exception e){
             e.printStackTrace();
         }
-    }*/
+    }
     @Test
     public void test50(){
         try {
