@@ -44,6 +44,8 @@ public class Slang {
         myStack = new Stack<Value>();
         /*/fg*/
 
+        //andreas
+        boolean err=false;
         AtomScanner sc = null;
 
         try {
@@ -53,7 +55,7 @@ public class Slang {
             return;
         }
 
-        while (sc.hasNext()) {
+        while (sc.hasNext() && !err) {
             if (sc.hasNextString()) {
                 /*fg:
                  * default:{ System.out.println("STRING: " + sc.nextString());} */
@@ -69,7 +71,8 @@ public class Slang {
             else if (sc.hasNextAtom()) {
                 /*fg:
                  * default: System.out.println("ATOM: " + sc.nextAtom());*/
-                switch(sc.nextAtom()) {
+                String s = sc.nextAtom(); //andreas
+                switch( s ) {
                     case ".s": printStack(); break;
                     case "prin": f_prin(); break;
                     case "print": f_print(); break;
@@ -89,13 +92,16 @@ public class Slang {
                     case "copy-to": f_copyto(); break;
                     case "dup": f_dup(); break;
                     case "pop": f_pop(); break;
-                    default: //TODO: throw error
+                    default:    System.out.println("[PARSER ERROR] unknown atom '" + s + "'"); //andreas
+                                err=true;
+                                //throw new LexerError("[PARSER ERROR] unknown atom '" + s + "'"); //andreas
                 }
                 /*/fg*/
             }
             else {
                 System.out.println("UNKNOWN: " + sc.next());
-                //TODO: throw error
+                //TODO: throw error, change if this is wrong :D
+                throw new LexerError("UNKNOWN: " + sc.next()); //andreas
             }
         }
     }
@@ -150,7 +156,7 @@ public class Slang {
                 }
                 myStack.push(new StringValue(s));
             } catch (Exception e){
-                //TODO: resolve exceptions
+                //TODO: resolve exceptions, still dont know what to do here...
                 e.printStackTrace();
             }
         } else {
@@ -163,7 +169,9 @@ public class Slang {
                 }
                 myStack.push(new StringValue(sb.toString()));
             } catch (Exception e){
-                //TODO: resolve exceptions
+                //TODO: resolve exceptions, same here.
+                System.out.println("[EVAL ERROR] file not found: " + s);
+                //throw new LexerError("[EVAL ERROR] file not found: " + s);
             }
         }
     }
@@ -179,7 +187,7 @@ public class Slang {
             bw.close();
         } catch (Exception e) {
             System.out.println("ERROR IN WRITE");
-            //TODO: resolve exceptions
+            //TODO: resolve exceptions, I dont wanna.
         }
     }
     private static void f_ask(){
@@ -196,32 +204,37 @@ public class Slang {
     }
     private static void f_skipto(){ //andreas
         String s = myStack.pop().toS();
+        String s2 = myStack.pop().toS();
         try {
-            myStack.push(new StringValue(s.substring(s.indexOf(myStack.pop().toS()))));
+            myStack.push(new StringValue(s2.substring(s2.indexOf(s))));
         }catch( IndexOutOfBoundsException e ) {
             myStack.push(new StringValue(""));
         }
     }
     private static void f_skipn(){ //andreas
-        String s = myStack.pop().toS();
+        Value s = myStack.pop();
+        String s2 = myStack.pop().toS();
         try {
-            myStack.push(new StringValue(s.substring(myStack.pop().toI())));
+            myStack.push(new StringValue(s2.substring(s.toI())));
         }catch( IndexOutOfBoundsException e ) {
             myStack.push(new StringValue(""));
         }
     }
     private static void f_trunc(){ //andreas
-        String s = myStack.pop().toS();
+        Value s = myStack.pop();
+        String s2 = myStack.pop().toS();
         try {
-            myStack.push(new StringValue(s.substring(0, myStack.pop().toI())));
+            if( s.toI()>s2.length()-1 ) myStack.push(new StringValue(s2));
+            else myStack.push(new StringValue(s2.substring(0, s.toI())));
         }catch( IndexOutOfBoundsException e ) {
             myStack.push(new StringValue(""));
         }
     }
     private static void f_copyto(){ //andreas
         String s = myStack.pop().toS();
+        String s2 = myStack.pop().toS();
         try {
-            myStack.push(new StringValue(s.substring(0, s.indexOf(myStack.pop().toS()))));
+            myStack.push(new StringValue(s2.substring(0, s2.indexOf(s))));
         }catch( IndexOutOfBoundsException e ) {
             myStack.push(new StringValue(""));
         }
